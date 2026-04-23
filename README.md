@@ -5,8 +5,8 @@ Config files for generating distrobox containers for use with Cyclone Robosub. C
 - Install `docker` or `podman`, and install `distrobox`
 - `cd` into this repository
 - run `./configure_bashrc.sh`
-- If you are running with fractional display scaling, uncomment the indicated lines in `ubuntu_matlab.ini`
-    - You can check this in your computer's display settings. If you see 100% or 200%, you're fine. If you see something else, you're using fractional scaling.
+- If you are running with scaling other than 100%, uncomment the indicated line in `ubuntu_matlab.ini`
+    - You can check this in your computer's display settings. If you see 100%, you're fine.
 
 ## How to Create Containers
 - `cd` into this repository
