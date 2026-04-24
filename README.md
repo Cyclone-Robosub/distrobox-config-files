@@ -3,7 +3,7 @@ Config files for generating distrobox containers for use with Cyclone Robosub. C
 
 ## Setup
 - Install `docker` or `podman`, and install `distrobox`
-    - If you are on Ubuntu 24.04, the version in `apt` **will not work!** Instead, install it from [Distrobox's GitHub page](https://github.com/89luca89/distrobox#installation). I recommend running `curl -s https://raw.githubusercontent.com/89luca89/distrobox/main/install | sudo sh`
+    - If you are on Ubuntu 24.04 or older, the `apt` version **will not work!** Instead, install it from [distrobox's GitHub page](https://github.com/89luca89/distrobox#installation). I recommend running `curl -s https://raw.githubusercontent.com/89luca89/distrobox/main/install | sudo sh`
 - `cd` into this repository
 - run `./configure_bashrc.sh`
 - If you are running with scaling other than 100%, uncomment the indicated line in `ubuntu_matlab.ini`
@@ -23,3 +23,4 @@ This may take a few minutes! Don't stop it partway through unless you're confide
 - Once inside the container, run `sudo /opt/matlab/R2025b/bin/glnxa64/MathWorksProductAuthorizer` and enter your credentials
     - Don't select "run matlab" in the credentials screen!
 - Type `matlab` to start matlab afterwards
+- If prompted to select a python version for the ros toolbox message generation, use `/usr/bin/python3.10`. 
