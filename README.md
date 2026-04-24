@@ -23,4 +23,4 @@ This may take a few minutes! Don't stop it partway through unless you're confide
 - Once inside the container, run `sudo /opt/matlab/R2025b/bin/glnxa64/MathWorksProductAuthorizer` and enter your credentials
     - Don't select "run matlab" in the credentials screen!
 - Type `matlab` to start matlab afterwards
-- If prompted to select a python version for the ros toolbox message generation, use `/usr/bin/python3.10`. 
+- If you get the error `Path to Python Executable is not set. Set the path to the Python executable using ROS Toolbox preferences.` when running `ros2genmsg()`, select `/usr/bin/python3.10`, then rebuild the Python environment with the button below the filepath box.
