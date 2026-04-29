@@ -5,7 +5,9 @@ if [[ ! -f "$(echo $HOME)/.container_setup.sh" ]]; then
 	chmod +x ~/.container_setup.sh;
 fi
 
-if [[ -z $(grep "source ~/.container_setup.sh" "$(echo $HOME)/.bashrc") ]]; then 
+USR_SHELL=$(echo $SHELL | awk -F  '/' '{print $NF}')
+
+if [[ -z $(grep "source ~/.container_setup.sh" "$(echo $HOME)/.$(echo $USR_SHELL)rc") ]]; then 
 	echo "" >> ~/.bashrc # Newline
 	echo "# For distrobox container setup:" >> ~/.bashrc
 	echo "source ~/.container_setup.sh" >> ~/.bashrc;
