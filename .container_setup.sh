@@ -21,9 +21,11 @@ if [ -n "$CONTAINER_ID" ] || [ -n "$DISTROBOX_ENTER_PATH" ]; then
     	alias thruster_test.sh="distrobox-host-exec $PICO_SCRIPT_PATH/thruster_test.sh"
     	alias all_thrusters.sh="distrobox-host-exec $PICO_SCRIPT_PATH/all_thrusters.sh"
     fi
-    alias poweroff="echo \"'poweroff' must be run from host. Type EOF (ctrl+d) to exit the container.\"" 
-    alias reboot="echo \"'reboot' must be run from host. Type EOF (ctrl+d) to exit the container.\""
-    alias shutdown="echo \"'shutdown' must be run from host. Type EOF (ctrl+d) to exit the container.\""
+
+    WARNING_MESSAGE="This command must be run on host. Type EOF (ctrl+d) to exit the container."
+    alias poweroff="echo \"$WARNING_MESSAGE\""
+    alias reboot="echo \"$WARNING_MESSAGE\""
+    alias shutdown="echo \"$WARNING_MESSAGE\""
     alias sudo="sudo " # Allows bash to recognise sudo aliases
 
     if [ $USR_SHELL = "bash" ]; then
