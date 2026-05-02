@@ -14,11 +14,11 @@ Config files for generating distrobox containers for use with Cyclone Robosub. C
 ## How to Create Containers
 - `cd` into this repository
 - run `distrobox-assemble create --file [filename]`
-    - `[filename]` is either `ubuntu_ros.ini` or `ubuntu_matlab.ini`
+    - `[filename]` is either `ubuntu-ros.ini` or `ubuntu-matlab.ini`
 
 ## How to Run Containers
 - run `distrobox-enter [container_name]`
-    - `[container_name]` is either `ubuntu_ros` or `ubuntu_matlab`
+    - `[container_name]` is either `ubuntu-ros` or `ubuntu-matlab`
 This may take a few minutes! Don't stop it partway through unless you're confident that it is hung.
 
 ## Matlab Additional Steps
