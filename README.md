@@ -13,8 +13,9 @@ Config files for generating distrobox containers for use with Cyclone Robosub. C
 
 ## How to Create Containers
 - `cd` into this repository
-- run `distrobox-assemble create --file [filename]`
-    - `[filename]` is either `ubuntu-ros.ini` or `ubuntu-matlab.ini`
+- run `./assemble.sh ubuntu-ros.ini` or `./assemble.sh ubuntu-matlab.ini`
+
+This will invoke distrobox to pull and use the existing docker image or as a fallback, build the container from scratch.
 
 ## How to Run Containers
 - run `distrobox-enter [container_name]`

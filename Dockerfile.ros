@@ -1,0 +1,35 @@
+FROM ubuntu:24.04
+
+ENV DEBIAN_FRONTEND=noninteractive
+
+# Packages from additional_packages
+RUN apt-get update && apt-get install -y \
+    git vim tmux btop gcc g++ make cmake ffmpeg neofetch \
+    wget gpg apt-transport-https \
+    software-properties-common curl jq libudev1 libudev-dev libboost-all-dev \
+    && rm -rf /var/lib/apt/lists/*
+
+# Install VS Code
+RUN if [ ! -f /usr/bin/code ]; then \
+    echo "code code/add-microsoft-repo boolean true" | debconf-set-selections && \
+    wget -qO- https://packages.microsoft.com/keys/microsoft.asc | gpg --dearmor > microsoft.gpg && \
+    install -D -o root -g root -m 644 microsoft.gpg /usr/share/keyrings/microsoft.gpg && \
+    rm -f microsoft.gpg && \
+    printf "Types: deb\nURIs: https://packages.microsoft.com/repos/code\nSuites: stable\nComponents: main\nArchitectures: amd64,arm64,armhf\nSigned-By: /usr/share/keyrings/microsoft.gpg\n" \
+        > /etc/apt/sources.list.d/vscode.sources && \
+    apt-get update && apt-get install -y code && \
+    rm -rf /var/lib/apt/lists/*; fi
+
+# Install ROS2 Jazzy
+RUN if [ ! -d /opt/ros/jazzy ]; then \
+    export ROS_APT_SOURCE_VERSION=$(curl -s https://api.github.com/repos/ros-infrastructure/ros-apt-source/releases/latest | jq -r .tag_name) && \
+    curl -L -o /tmp/ros2-apt-source.deb "https://github.com/ros-infrastructure/ros-apt-source/releases/download/${ROS_APT_SOURCE_VERSION}/ros2-apt-source_${ROS_APT_SOURCE_VERSION}.$(. /etc/os-release && echo ${UBUNTU_CODENAME:-${VERSION_CODENAME}})_all.deb" && \
+    dpkg -i /tmp/ros2-apt-source.deb && \
+    apt-get update && apt-get install -y ros-dev-tools && \
+    apt-get install -y ros-jazzy-ros-base ros-jazzy-rosbridge-server && \
+    rm -rf /var/lib/apt/lists/* /tmp/ros2-apt-source.deb; fi
+
+# Install bun (as root for the image layer; users will have it available)
+RUN curl -fsSL https://bun.sh/install | bash
+
+SHELL ["/bin/bash", "-c"]

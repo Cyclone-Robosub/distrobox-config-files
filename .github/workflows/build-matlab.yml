@@ -1,0 +1,51 @@
+name: Build and Push MATLAB Container
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'ubuntu-matlab.ini'
+      - 'mpm_input_r2025b.txt'
+  workflow_dispatch:
+
+jobs:
+  build-and-push:
+    runs-on: self-hosted  # ⚠️ Required — image too large for GitHub-hosted runners
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install distrobox
+        run: curl -s https://raw.githubusercontent.com/89luca89/distrobox/main/install | sudo sh
+
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ vars.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Build INI with base image
+        run: |
+          sed 's|image=docker.io/${{ vars.DOCKERHUB_USERNAME }}/cyclone-matlab:latest|image=docker.io/mathworks/matlab:R2025b|' \
+            ubuntu-matlab.ini > /tmp/ubuntu-matlab-build.ini
+
+      - name: Assemble container
+        run: DBX_NON_INTERACTIVE=1 distrobox-assemble create --file /tmp/ubuntu-matlab-build.ini
+
+      - name: Trigger first-enter initialization (runs init_hooks, installs MATLAB toolboxes)
+        run: distrobox-enter ubuntu-matlab -- true
+
+      - name: Stop container
+        run: distrobox-stop ubuntu-matlab
+
+      - name: Commit and push image  # ⚠️ Must be a private Docker Hub repo
+        run: |
+          docker commit ubuntu-matlab ${{ vars.DOCKERHUB_USERNAME }}/cyclone-matlab:latest
+          docker tag ${{ vars.DOCKERHUB_USERNAME }}/cyclone-matlab:latest \
+                     ${{ vars.DOCKERHUB_USERNAME }}/cyclone-matlab:${{ github.sha }}
+          docker push ${{ vars.DOCKERHUB_USERNAME }}/cyclone-matlab:latest
+          docker push ${{ vars.DOCKERHUB_USERNAME }}/cyclone-matlab:${{ github.sha }}
+
+      - name: Clean up container
+        if: always()
+        run: distrobox-rm --force ubuntu-matlab
