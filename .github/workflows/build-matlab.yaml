@@ -1,11 +1,6 @@
 name: Build and Push MATLAB Container
 
 on:
-  push:
-    branches: [main]
-    paths:
-      - 'Dockerfile.matlab'
-      - 'mpm_input_r2025b.txt'
   workflow_dispatch:
 
 jobs:
