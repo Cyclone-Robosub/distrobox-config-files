@@ -4,6 +4,12 @@ ENV DEBIAN_FRONTEND=noninteractive
 ENV QT_FONT_DPI=96
 USER root
 
+# Prevents buildx network timeouts and speed up install
+RUN echo 'Acquire::Retries "10";' > /etc/apt/apt.conf.d/80retries \
+    && echo 'Acquire::http::Timeout "120";' >> /etc/apt/apt.conf.d/80retries \
+    && echo 'Acquire::Queue-Mode "access";' >> /etc/apt/apt.conf.d/80retries \                                                      
+    && echo 'Acquire::http::Pipeline-Depth "10";' >> /etc/apt/apt.conf.d/80retries   
+
 # Dependencies from MathWorks' ubuntu24.04 base-dependencies list
 RUN apt-get update && apt-get install -y \
     git vim make cmake neofetch software-properties-common \
@@ -38,3 +44,5 @@ RUN wget -P /tmp/mpm https://www.mathworks.com/mpm/glnxa64/mpm \
 RUN ln -sf \
     /opt/matlab/R2025b/toolbox/compiler_sdk/mps_clients/python/dist/matlab/extern/bin/glnxa64/libstdc++.so.6 \
     /opt/matlab/R2025b/sys/os/glnxa64/libstdc++.so.6
+
+USER matlab
