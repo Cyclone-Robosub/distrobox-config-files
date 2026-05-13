@@ -45,3 +45,6 @@ RUN echo "code code/add-microsoft-repo boolean true" | debconf-set-selections \
 
 # Bun
 RUN export BUN_INSTALL=/usr/local && curl -fsSL https://bun.sh/install | bash
+
+# MediaMTX
+RUN wget -P /usr/local https://github.com/bluenviron/mediamtx/releases/download/v1.18.1/mediamtx_v1.18.1_linux_amd64.tar.gz && mkdir /usr/local/mediaMTX && tar -xzf mediamtx_v1.18.1_linux_amd64.tar.gz -C /usr/local/mediaMTX && rm /usr/local/mediamtx_v1.18.1_linux_amd64.tar.gz
