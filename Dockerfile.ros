@@ -1,0 +1,47 @@
+FROM ubuntu:24.04
+ENV DEBIAN_FRONTEND=noninteractive
+
+# Prevents buildx network timeouts and speed up install
+RUN echo 'Acquire::Retries "10";' > /etc/apt/apt.conf.d/80retries \
+    && echo 'Acquire::http::Timeout "120";' >> /etc/apt/apt.conf.d/80retries \
+    && echo 'Acquire::Queue-Mode "access";' >> /etc/apt/apt.conf.d/80retries \                                                      
+    && echo 'Acquire::http::Pipeline-Depth "10";' >> /etc/apt/apt.conf.d/80retries   
+
+# Core packages
+RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
+    --mount=type=cache,target=/var/lib/apt,sharing=locked \
+    apt-get update && apt-get install -y \
+    git vim tmux btop gcc g++ make cmake ffmpeg neofetch \
+    wget gpg apt-transport-https \
+    software-properties-common curl jq \
+    libudev1 libudev-dev libboost-all-dev \
+    unzip \
+    && rm -rf /var/lib/apt/lists/*
+
+
+# ROS2 Jazzy - add apt source
+RUN export ROS_APT_SOURCE_VERSION=$(curl -s https://api.github.com/repos/ros-infrastructure/ros-apt-source/releases/latest | jq -r .tag_name) \
+    && curl -L -o /tmp/ros2-apt-source.deb \
+    "https://github.com/ros-infrastructure/ros-apt-source/releases/download/${ROS_APT_SOURCE_VERSION}/ros2-apt-source_${ROS_APT_SOURCE_VERSION}.$(. /etc/os-release && echo ${UBUNTU_CODENAME:-${VERSION_CODENAME}})_all.deb" \
+    && dpkg -i /tmp/ros2-apt-source.deb \
+    && rm -rf /tmp/ros2-apt-source.deb
+
+# ROS2 Jazzy - install packages
+RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
+    --mount=type=cache,target=/var/lib/apt,sharing=locked \
+    apt-get update \
+    && apt-get install -y --fix-missing \
+    ros-dev-tools ros-jazzy-ros-base ros-jazzy-rosbridge-server \
+    && rm -rf /var/lib/apt/lists/*
+
+# VS Code
+RUN echo "code code/add-microsoft-repo boolean true" | debconf-set-selections \
+    && wget -qO- https://packages.microsoft.com/keys/microsoft.asc \
+    | gpg --dearmor > /usr/share/keyrings/microsoft.gpg \
+    && printf "Types: deb\nURIs: https://packages.microsoft.com/repos/code\nSuites: stable\nComponents: main\nArchitectures: amd64,arm64,armhf\nSigned-By: /usr/share/keyrings/microsoft.gpg\n" \
+    > /etc/apt/sources.list.d/vscode.sources \
+    && apt-get update && apt-get install -y code \
+    && rm -rf /var/lib/apt/lists/*
+
+# Bun
+RUN export BUN_INSTALL=/usr/local && curl -fsSL https://bun.sh/install | bash
