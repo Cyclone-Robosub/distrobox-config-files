@@ -60,7 +60,7 @@ To build images explicitly without creating containers, use build-local.sh.
 EOF
 }
 
-./.configure_shellrc.sh
+./.configure-shellrc.sh
 
 case "${1:-help}" in
     ros)    create_ros ;;
