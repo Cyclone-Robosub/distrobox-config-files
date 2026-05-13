@@ -10,7 +10,7 @@ For Linux:
     - Distobox uses this for `distrobox-host-exec`
 - `cd` into this repository
 - run `./configure_bashrc.sh`
-- If you are running with scaling other than 100% and plan to use MATLAB, uncomment the indicated line in `ubuntu_matlab.ini`
+- If you are running with scaling other than 100% and plan to use MATLAB, uncomment the indicated line in `setup-containers.sh`
     - You can check this in your computer's display settings. If you see 100%, you're fine.
 
 ## Local Image Builds
