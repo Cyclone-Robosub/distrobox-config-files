@@ -43,11 +43,8 @@ RUN echo "code code/add-microsoft-repo boolean true" | debconf-set-selections \
     && apt-get update && apt-get install -y code \
     && rm -rf /var/lib/apt/lists/*
 
-# /usr/local-distrobox to avoid conflicts with /usr/local
-RUN mkdir /usr/local-distrobox
-
 # Bun
-RUN export BUN_INSTALL=/usr/local-distrobox curl -fsSL https://bun.sh/install | bash
+RUN export BUN_INSTALL=/opt/bun && mkdir /opt/bun && curl -fsSL https://bun.sh/install | bash
 
 # MediaMTX
-RUN wget -P /usr/local-distrobox https://github.com/bluenviron/mediamtx/releases/download/v1.18.1/mediamtx_v1.18.1_linux_amd64.tar.gz && mkdir /usr/local-distrobox/mediaMTX && tar -xzf /usr/local-distrobox/mediamtx_v1.18.1_linux_amd64.tar.gz -C /usr/local-distrobox/mediaMTX && rm /usr/local-distrobox/mediamtx_v1.18.1_linux_amd64.tar.gz
+RUN mkdir /opt/mediaMTX && wget -P /opt/mediaMTX https://github.com/bluenviron/mediamtx/releases/download/v1.18.1/mediamtx_v1.18.1_linux_amd64.tar.gz && tar -xzf /opt/mediaMTX/mediamtx_v1.18.1_linux_amd64.tar.gz -C /opt/mediaMTX && rm /opt/mediaMTX/mediamtx_v1.18.1_linux_amd64.tar.gz
