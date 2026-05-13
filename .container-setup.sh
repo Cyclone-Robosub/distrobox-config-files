@@ -6,7 +6,7 @@ fi
 
 
 if [ -n "$CONTAINER_ID" ] || [ -n "$DISTROBOX_ENTER_PATH" ]; then
-    export PATH="$PATH:/opt/bun:/opt/mediaMTX"
+    export PATH="$PATH:/opt/bun/bin:/opt/mediaMTX"
     if [ -x /usr/bin/dircolors ]; then
         alias ls='ls --color=auto'
         alias grep='grep --color=auto'
