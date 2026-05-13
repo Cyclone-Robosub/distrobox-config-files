@@ -1,0 +1,65 @@
+name: Build and Push ROS Container
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'Dockerfile.ros'
+      - '.container_setup.sh'
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ${{ matrix.runner }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - platform: linux/amd64
+            runner: ubuntu-latest
+          - platform: linux/arm64
+            runner: ubuntu-24.04-arm
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: docker/login-action@v3
+        with:
+          username: ${{ vars.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - uses: docker/setup-buildx-action@v3
+
+      - name: Prepare platform tag suffix
+        id: prep
+        run: echo "suffix=$(echo ${{ matrix.platform }} | tr '/' '-')" >> $GITHUB_OUTPUT
+
+      - uses: docker/build-push-action@v6
+        id: build
+        with:
+          context: .
+          file: Dockerfile.ros
+          platforms: ${{ matrix.platform }}
+          push: true
+          tags: ${{ vars.DOCKERHUB_USERNAME }}/cyclone-ros:${{ github.sha }}-${{ steps.prep.outputs.suffix }}
+          cache-from: type=registry,ref=${{ vars.DOCKERHUB_USERNAME }}/cyclone-ros:buildcache-${{ steps.prep.outputs.suffix }}
+          cache-to: type=registry,ref=${{ vars.DOCKERHUB_USERNAME }}/cyclone-ros:buildcache-${{ steps.prep.outputs.suffix }},mode=max
+
+  merge:
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - uses: docker/login-action@v3
+        with:
+          username: ${{ vars.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - uses: docker/setup-buildx-action@v3
+
+      - name: Create and push multi-arch manifest
+        run: |
+          docker buildx imagetools create \
+            -t ${{ vars.DOCKERHUB_USERNAME }}/cyclone-ros:latest \
+            -t ${{ vars.DOCKERHUB_USERNAME }}/cyclone-ros:${{ github.sha }} \
+            ${{ vars.DOCKERHUB_USERNAME }}/cyclone-ros:${{ github.sha }}-linux-amd64 \
+            ${{ vars.DOCKERHUB_USERNAME }}/cyclone-ros:${{ github.sha }}-linux-arm64
