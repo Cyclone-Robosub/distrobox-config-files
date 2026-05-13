@@ -4,7 +4,7 @@ Config files for generating distrobox containers for use with Cyclone Robosub. C
 ## Setup
 For Linux:
 
-- Install `docker` or `podman`, and optionally `distrobox`
+- Install `docker` or `podman`, and install `distrobox`
     - If you are on Ubuntu 24.04 or older, the `apt` version **will not work!** Instead, install it from [distrobox's GitHub page](https://github.com/89luca89/distrobox#installation). I recommend running `curl -s https://raw.githubusercontent.com/89luca89/distrobox/main/install | sudo sh`
 - Install `flatpak`
     - Distobox uses this for `distrobox-host-exec`
