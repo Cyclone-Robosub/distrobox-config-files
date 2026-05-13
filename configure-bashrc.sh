@@ -7,8 +7,8 @@ fi
 
 USR_SHELL=$(echo $SHELL | awk -F  '/' '{print $NF}')
 
-if [[ -z $(grep "source ~/.container-setup.sh" "$(echo $HOME)/.$(echo $USR_SHELL)rc") ]]; then 
-	echo "" >> ~/.bashrc # Newline
-	echo "# For distrobox container setup:" >> ~/.bashrc
-	echo "source ~/.container-setup.sh" >> ~/.bashrc;
+if [[ -z $(grep "source ~/.container-setup.sh" "$(echo $HOME)/.$(echo $USR_SHELL)rc") ]]; then
+	echo "" >> ~/.$(echo $USR_SHELL)rc # Newline
+	echo "# For distrobox container setup:" >> ~/.$(echo $USR_SHELL)rc
+	echo "source ~/.container-setup.sh" >> ~/.$(echo $USR_SHELL)rc;
 fi
