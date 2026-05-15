@@ -47,4 +47,4 @@ RUN echo "code code/add-microsoft-repo boolean true" | debconf-set-selections \
 RUN export BUN_INSTALL=/opt/bun && mkdir /opt/bun && curl -fsSL https://bun.sh/install | bash
 
 # MediaMTX
-RUN mkdir /opt/mediaMTX && wget -P /opt/mediaMTX https://github.com/bluenviron/mediamtx/releases/download/v1.18.1/mediamtx_v1.18.1_linux_${TARGETARCH}.tar.gz && tar -xzf /opt/mediaMTX/mediamtx_v1.18.1_linux_${TARGETARCH}.tar.gz -C /opt/mediaMTX && rm /opt/mediaMTX/mediamtx_v1.18.1_linux_${TARGETARCH}.tar.gz
+RUN mkdir /opt/mediaMTX && wget -P "/opt/mediaMTX https://github.com/bluenviron/mediamtx/releases/download/v1.18.1/mediamtx_v1.18.1_linux_${TARGETARCH}.tar.gz" && tar -xzf "/opt/mediaMTX/mediamtx_v1.18.1_linux_${TARGETARCH}.tar.gz" -C /opt/mediaMTX && rm "/opt/mediaMTX/mediamtx_v1.18.1_linux_${TARGETARCH}.tar.gz"
