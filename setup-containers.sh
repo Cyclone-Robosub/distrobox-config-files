@@ -34,12 +34,17 @@ pull_or_build() {
     local platform_flag=""
     [ -n "$platform" ] && platform_flag="--platform $platform"
 
-    if "$RUNTIME" pull ${platform_flag} "$image" 2>/dev/null; then
+    local err_file
+    err_file=$(mktemp)
+    if "$RUNTIME" pull ${platform_flag} "$image" 2>"$err_file"; then
         echo "Using pre-built image: $image"
     else
-        echo "Registry unavailable. Building $image locally..."
+        echo "Pull failed for $image:" >&2
+        cat "$err_file" >&2
+        echo "Falling back to local build..." >&2
         "$SCRIPT_DIR/build-local.sh" "$build_target"
     fi
+    rm -f "$err_file"
 }
 
 create_ros() {
