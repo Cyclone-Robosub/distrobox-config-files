@@ -12,6 +12,20 @@ SCALE_FACTOR="${QT_SCALE_FACTOR:-1.0}"
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
+# Detect container runtime: prefer podman, fall back to docker.
+# Override with: CONTAINER_RUNTIME=docker ./setup-containers.sh
+if [ -n "${CONTAINER_RUNTIME:-}" ]; then
+    RUNTIME="$CONTAINER_RUNTIME"
+elif command -v podman &>/dev/null; then
+    RUNTIME=podman
+elif command -v docker &>/dev/null; then
+    RUNTIME=docker
+else
+    echo "Error: neither podman nor docker found in PATH" >&2
+    exit 1
+fi
+export CONTAINER_RUNTIME="$RUNTIME"  # propagate to build-local.sh if invoked
+
 pull_or_build() {
     local image="$1"
     local build_target="$2"  # ros or matlab — forwarded to build-local.sh
@@ -20,7 +34,7 @@ pull_or_build() {
     local platform_flag=""
     [ -n "$platform" ] && platform_flag="--platform $platform"
 
-    if docker pull ${platform_flag} "$image" 2>/dev/null; then
+    if "$RUNTIME" pull ${platform_flag} "$image" 2>/dev/null; then
         echo "Using pre-built image: $image"
     else
         echo "Registry unavailable. Building $image locally..."

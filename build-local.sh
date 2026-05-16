@@ -6,15 +6,28 @@ set -e
 ROS_IMAGE="docker.io/crsaggies/cyclone-ros:latest"
 MATLAB_IMAGE="docker.io/crsaggies/cyclone-matlab:latest"
 
+# Detect container runtime: prefer podman, fall back to docker.
+# Override with: CONTAINER_RUNTIME=docker ./build-local.sh
+if [ -n "${CONTAINER_RUNTIME:-}" ]; then
+    RUNTIME="$CONTAINER_RUNTIME"
+elif command -v podman &>/dev/null; then
+    RUNTIME=podman
+elif command -v docker &>/dev/null; then
+    RUNTIME=docker
+else
+    echo "Error: neither podman nor docker found in PATH" >&2
+    exit 1
+fi
+
 build_ros() {
-    docker build -t "$ROS_IMAGE" -f Dockerfile.ros .
+    "$RUNTIME" build -t "$ROS_IMAGE" -f Dockerfile.ros .
 }
 
 build_ros_multiarch() {
     # Two prerequisites:
-    #   1. Registry access: run `docker login docker.io` (or equivalent) first.
-    #   2. A buildx builder with QEMU binfmt support: see README for setup.
-    docker buildx build \
+    #   1. Registry access: run `$RUNTIME login docker.io` first.
+    #   2. QEMU binfmt support: see README for setup.
+    "$RUNTIME" buildx build \
         --platform linux/amd64,linux/arm64 \
         --tag "$ROS_IMAGE" \
         --file Dockerfile.ros \
@@ -23,7 +36,7 @@ build_ros_multiarch() {
 }
 
 build_matlab() {
-    docker build --platform linux/amd64 -t "$MATLAB_IMAGE" -f Dockerfile.matlab .
+    "$RUNTIME" build --platform linux/amd64 -t "$MATLAB_IMAGE" -f Dockerfile.matlab .
 }
 
 print_help() {

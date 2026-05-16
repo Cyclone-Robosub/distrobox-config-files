@@ -17,15 +17,21 @@ If you cannot pull from the registry (no access, or you want to test local chang
 
 ### Prerequisites
 
-- **Docker** with [BuildKit](https://docs.docker.com/build/buildkit/) enabled (Docker Engine ≥ 23 or Docker Desktop — both include BuildKit by default)
-- **For `ros-multiarch` only:** (You only need to do this once)
+- **Docker or Podman** — the scripts auto-detect which is available (podman preferred when both are installed). Override with `CONTAINER_RUNTIME=docker` or `CONTAINER_RUNTIME=podman`.
+- **For `ros-multiarch` only:** One-time setup (QEMU + registry login):
 
-```bash
-docker run --privileged --rm tonistiigi/binfmt --install all
-docker buildx create --name multiarch --driver docker-container --use
-docker buildx inspect --bootstrap
-docker login docker.io
-```
+  **Docker:**
+  ```bash
+  docker run --privileged --rm tonistiigi/binfmt --install all
+  docker buildx create --name multiarch --driver docker-container --use
+  docker buildx inspect --bootstrap
+  docker login docker.io
+  ```
+  **Podman** (no `buildx create` needed — podman's buildx shim uses the host binfmt directly):
+  ```bash
+  podman run --privileged --rm tonistiigi/binfmt --install all
+  podman login docker.io
+  ```
 
 ### Build Commands
 
