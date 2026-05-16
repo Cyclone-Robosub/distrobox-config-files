@@ -25,6 +25,7 @@ else
     exit 1
 fi
 export CONTAINER_RUNTIME="$RUNTIME"  # propagate to build-local.sh if invoked
+trap 'echo; echo "Aborted." >&2; exit 130' INT
 
 pull_or_build() {
     local image="$1"
@@ -34,17 +35,12 @@ pull_or_build() {
     local platform_flag=""
     [ -n "$platform" ] && platform_flag="--platform $platform"
 
-    local err_file
-    err_file=$(mktemp)
-    if "$RUNTIME" pull ${platform_flag} "$image" 2>"$err_file"; then
+    if "$RUNTIME" pull ${platform_flag} "$image"; then
         echo "Using pre-built image: $image"
     else
-        echo "Pull failed for $image:" >&2
-        cat "$err_file" >&2
-        echo "Falling back to local build..." >&2
+        echo "Pull failed, falling back to local build..." >&2
         "$SCRIPT_DIR/build-local.sh" "$build_target"
     fi
-    rm -f "$err_file"
 }
 
 create_ros() {
