@@ -18,6 +18,7 @@ If you cannot pull from the registry (no access, or you want to test local chang
 ### Prerequisites
 
 - **Docker or Podman** — the scripts auto-detect which is available (podman preferred when both are installed). Override with `CONTAINER_RUNTIME=docker` or `CONTAINER_RUNTIME=podman`.
+    - **Make sure that rootless mode is configured**. Otherwise you might see errors regarding not beign able to connect to socket and so forth
 - **For `ros-multiarch` only:** One-time setup (QEMU + registry login):
 
   **Docker:**
