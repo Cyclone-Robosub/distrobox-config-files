@@ -49,7 +49,17 @@ Normal workflow involves the [How to Create Conatiners](#how-to-create-container
 ## How to Create Containers
 
 - `cd` into this repository
-- run `./setup-containers.sh help` to see the possible commands and their descriptions.
+- Run `./setup-containers.sh help` to see the possible commands, options, and their descriptions.
+
+### Local Changes & Development
+If you have modified a Dockerfile locally (e.g. to copy/add files or packages) and want to apply these changes to your Distrobox container, use the `--local` and `--recreate` flags:
+
+```bash
+./setup-containers.sh ros --local --recreate
+```
+
+* `--local`: Instructs the script to force building the container image from the local Dockerfiles instead of pulling the pre-built version from the registry.
+* `--recreate`: Automatically removes the existing container before recreating it with the new image, ensuring the latest changes are loaded.
 
 ## How to Run Containers
 
