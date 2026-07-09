@@ -77,8 +77,7 @@ create_ros() {
     DBX_CONTAINER_ALWAYS_PULL=0 distrobox create \
         --image "$ROS_IMAGE" \
         --name ubuntu-ros \
-        --hostname ubuntu- \
-        --additional-flags "--device /dev/ttyUSB0" 
+        --hostname ubuntu-ros 
         # --init-hooks "/start-microros-agent.sh"
 }
 

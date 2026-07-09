@@ -4,6 +4,10 @@ if [ -f /opt/ros/jazzy/setup.bash ]; then
     source /opt/ros/jazzy/setup.$USR_SHELL;
 fi
 
+if [ -f /uros_ws/install/setup.bash ]; then
+    source /uros_ws/install/setup.$USR_SHELL;
+fi
+
 
 if [ -n "$CONTAINER_ID" ] || [ -n "$DISTROBOX_ENTER_PATH" ]; then
     export PATH="$PATH:/opt/bun/bin:/opt/mediaMTX"
