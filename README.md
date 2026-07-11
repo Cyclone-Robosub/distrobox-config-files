@@ -71,7 +71,7 @@ This may take a few minutes! Don't stop it partway through unless you're confide
 
 - run `source /uros_ws/install/setup.bash`
 
-- run `LD_LIBRARY_PATH=/opt/ros/jazzy-agent/lib:$LD_LIBRARY_PATH \ ros2 run micro_ros_agent micro_ros_agent serial --dev /dev/ttyUSB0`
+- run `LD_LIBRARY_PATH=/opt/ros/jazzy-agent/lib:$LD_LIBRARY_PATH ros2 run micro_ros_agent micro_ros_agent serial --dev /dev/ttyUSB0 -b 921600`
 
 ## Matlab Additional Steps
 
