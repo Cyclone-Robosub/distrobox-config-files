@@ -1,5 +1,6 @@
 FROM ubuntu:24.04
 ENV DEBIAN_FRONTEND=noninteractive
+ARG TARGETARCH
 
 # Prevents buildx network timeouts and speed up install
 RUN echo 'Acquire::Retries "10";' > /etc/apt/apt.conf.d/80retries \
@@ -11,13 +12,28 @@ RUN echo 'Acquire::Retries "10";' > /etc/apt/apt.conf.d/80retries \
 RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
     --mount=type=cache,target=/var/lib/apt,sharing=locked \
     apt-get update && apt-get install -y \
-    git vim tmux btop gcc g++ make cmake ffmpeg neofetch \
-    wget gpg apt-transport-https \
-    software-properties-common curl jq \
+    wget gpg apt-transport-https ca-certificates curl \
+    software-properties-common && \
+    add-apt-repository ppa:maveonair/helix-editor  && \
+    apt-get install -y git vim tmux btop gcc g++ make \ 
+    cmake ffmpeg neofetch curl jq \
     libudev1 libudev-dev libboost-all-dev \
     unzip v4l-utils \
+    vim nano helix \ 
+    i2c-tools \
     && rm -rf /var/lib/apt/lists/*
 
+# Lazygit if VSCode doesn't work
+RUN case "${TARGETARCH}" in \
+        amd64) LAZYGIT_ARCH="x86_64" ;; \
+        arm64) LAZYGIT_ARCH="arm64" ;; \
+        *) echo "Unsupported TARGETARCH: ${TARGETARCH}" && exit 1 ;; \
+    esac \
+    && LAZYGIT_VERSION=$(curl -s "https://api.github.com/repos/jesseduffield/lazygit/releases/latest" | grep -Po '"tag_name": *"v\K[^"]*') \
+    && curl -Lo /tmp/lazygit.tar.gz "https://github.com/jesseduffield/lazygit/releases/download/v${LAZYGIT_VERSION}/lazygit_${LAZYGIT_VERSION}_Linux_${LAZYGIT_ARCH}.tar.gz" \
+    && tar -xf /tmp/lazygit.tar.gz -C /tmp lazygit \
+    && install /tmp/lazygit -D -t /usr/local/bin/ \
+    && rm -f /tmp/lazygit.tar.gz /tmp/lazygit
 
 # ROS2 Jazzy - add apt source
 RUN export ROS_APT_SOURCE_VERSION=$(curl -s https://api.github.com/repos/ros-infrastructure/ros-apt-source/releases/latest | jq -r .tag_name) \
@@ -42,6 +58,12 @@ RUN echo "code code/add-microsoft-repo boolean true" | debconf-set-selections \
     > /etc/apt/sources.list.d/vscode.sources \
     && apt-get update && apt-get install -y code \
     && rm -rf /var/lib/apt/lists/*
+
+# Install uv
+ADD https://astral.sh/uv/install.sh /uv-installer.sh
+
+# Run the installer then remove it
+RUN sh /uv-installer.sh && rm /uv-installer.sh
 
 # Bun
 RUN export BUN_INSTALL=/opt/bun && mkdir /opt/bun && curl -fsSL https://bun.sh/install | bash
