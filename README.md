@@ -4,21 +4,20 @@ Config files for generating distrobox containers for use with Cyclone Robosub. C
 ## Setup
 For Linux:
 
-- Install `docker` or `podman`, and install `distrobox`
+- Install `podman`, and install `distrobox`
     - If you are on Ubuntu 24.04 or older, the `apt` version **will not work!** Instead, install it from [distrobox's GitHub page](https://github.com/89luca89/distrobox#installation). I recommend running `curl -s https://raw.githubusercontent.com/89luca89/distrobox/main/install | sudo sh`
+    - While docker should work, podman comes installed in ubuntu by default and in some edge case some of the system hardware won't be usable in the container
 - Install `flatpak`
-    - Distobox uses this for `distrobox-host-exec`
+    - Distrobox uses this for `distrobox-host-exec`
 - If you are running with scaling other than 100% and plan to use MATLAB, uncomment the indicated line in `setup-containers.sh`
     - You can check this in your computer's display settings. If you see 100%, you're fine.
 
-## Local Image Builds
-
-If you cannot pull from the registry (no access, or you want to test local changes), use `build-local.sh` to build images yourself.
 
 ### Prerequisites
 
 - **Docker or Podman** — the scripts auto-detect which is available (podman preferred when both are installed). Override with `CONTAINER_RUNTIME=docker` or `CONTAINER_RUNTIME=podman`.
-    - **Make sure that rootless mode is configured**. Otherwise you might see errors regarding not beign able to connect to socket and so forth
+    - For **docker only**, **make sure that rootless mode is configured**. Otherwise you might see errors regarding not being able to connect to socket and so forth
+        - This is not a issue on podman
 - **For `ros-multiarch` only:** One-time setup (QEMU + registry login):
 
   **Docker:**
@@ -28,15 +27,16 @@ If you cannot pull from the registry (no access, or you want to test local chang
   docker buildx inspect --bootstrap
   docker login docker.io
   ```
-  **Podman** (no `buildx create` needed — podman's buildx shim uses the host binfmt directly):
+  **Podman**:
   ```bash
   podman run --privileged --rm tonistiigi/binfmt --install all
   podman login docker.io
   ```
+## Local Image Builds
 
-### Build Commands
+If you cannot pull from the registry (no access, or you want to test local changes), use `build-local.sh` to build images yourself.
 
-These commands are really only here for maintenance and in case anything goes wrong.
+These commands are really only here for manually updating and pushing the container and if you don't have internet access to pull the image.
 Normal workflow involves the [How to Create Conatiners](#how-to-create-containers) section.
 
 ```bash
@@ -49,17 +49,7 @@ Normal workflow involves the [How to Create Conatiners](#how-to-create-container
 ## How to Create Containers
 
 - `cd` into this repository
-- Run `./setup-containers.sh help` to see the possible commands, options, and their descriptions.
-
-### Local Changes & Development
-If you have modified a Dockerfile locally (e.g. to copy/add files or packages) and want to apply these changes to your Distrobox container, use the `--local` and `--recreate` flags:
-
-```bash
-./setup-containers.sh ros --local --recreate
-```
-
-* `--local`: Instructs the script to force building the container image from the local Dockerfiles instead of pulling the pre-built version from the registry.
-* `--recreate`: Automatically removes the existing container before recreating it with the new image, ensuring the latest changes are loaded.
+- run `./setup-containers.sh help` to see the possible commands and their descriptions. You choose a image to pull or in case of no internet access, build the container locally
 
 ## How to Run Containers
 
