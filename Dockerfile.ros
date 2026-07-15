@@ -1,3 +1,6 @@
+# --- micro-ROS agent builder stage ---
+FROM docker.io/microros/micro-ros-agent:jazzy AS microros_agent
+
 FROM ubuntu:24.04
 ENV DEBIAN_FRONTEND=noninteractive
 
@@ -18,7 +21,6 @@ RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
     unzip v4l-utils \
     && rm -rf /var/lib/apt/lists/*
 
-
 # ROS2 Jazzy - add apt source
 RUN export ROS_APT_SOURCE_VERSION=$(curl -s https://api.github.com/repos/ros-infrastructure/ros-apt-source/releases/latest | jq -r .tag_name) \
     && curl -L -o /tmp/ros2-apt-source.deb \
@@ -32,6 +34,7 @@ RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
     apt-get update \
     && apt-get install -y --fix-missing \
     ros-dev-tools ros-jazzy-ros-base ros-jazzy-rosbridge-server \
+    ros-jazzy-behaviortree-cpp ros-jazzy-generate-parameter-library \
     && rm -rf /var/lib/apt/lists/*
 
 # VS Code
@@ -48,3 +51,7 @@ RUN export BUN_INSTALL=/opt/bun && mkdir /opt/bun && curl -fsSL https://bun.sh/i
 
 # MediaMTX
 RUN arch=$(arch | sed s/aarch64/arm64/ | sed s/x86_64/amd64/) && mkdir /opt/mediaMTX && wget -P /opt/mediaMTX https://github.com/bluenviron/mediamtx/releases/download/v1.18.1/mediamtx_v1.18.1_linux_${arch}.tar.gz && tar -xzf /opt/mediaMTX/mediamtx_v1.18.1_linux_${arch}.tar.gz -C /opt/mediaMTX && rm /opt/mediaMTX/mediamtx_v1.18.1_linux_${arch}.tar.gz
+
+# Copy the pre-built micro-ROS agent workspace
+COPY --from=microros_agent /uros_ws /uros_ws
+COPY --from=microros_agent /opt/ros/jazzy /opt/ros/jazzy-agent
